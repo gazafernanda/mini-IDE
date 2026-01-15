@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini IDE - AI Powered Code Editor</title>
+    <meta name="description" content="A browser-based IDE with AI-powered code editing using Claude Opus 4.5">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Monaco Editor -->
+    <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+                <span>Mini IDE</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-icon" id="uploadBtn" title="Upload Folder">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>Upload Folder</span>
+                </button>
+                <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
+                <div class="ai-status" id="aiStatus">
+                    <span class="status-dot"></span>
+                    <span>Claude Opus 4.5</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- File Explorer Panel -->
+            <aside class="panel file-explorer">
+                <div class="panel-header">
+                    <h3>Explorer</h3>
+                </div>
+                <div class="panel-content" id="fileTree">
+                    <div class="empty-state">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                            </path>
+                        </svg>
+                        <p>Upload a folder to get started</p>
+                        <button class="btn btn-primary" id="emptyUploadBtn">
+                            Upload Folder
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Editor Panel -->
+            <section class="panel editor-panel">
+                <div class="tabs-container" id="tabsContainer">
+                    <div class="tabs" id="editorTabs">
+                        <!-- Tabs will be added dynamically -->
+                    </div>
+                </div>
+                <div class="editor-wrapper">
+                    <div id="monacoEditor" class="monaco-container">
+                        <div class="editor-placeholder">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1">
+                                <polyline points="16 18 22 12 16 6"></polyline>
+                                <polyline points="8 6 2 12 8 18"></polyline>
+                            </svg>
+                            <h2>Welcome to Mini IDE</h2>
+                            <p>Select a file from the explorer or upload a folder to start editing</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Panel -->
+            <aside class="panel chat-panel">
+                <div class="panel-header">
+                    <h3>AI Assistant</h3>
+                    <span class="model-badge">Claude Opus 4.5</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="ai-avatar">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z">
+                                </path>
+                                <circle cx="7.5" cy="14.5" r="1.5"></circle>
+                                <circle cx="16.5" cy="14.5" r="1.5"></circle>
+                            </svg>
+                        </div>
+                        <div class="message-content">
+                            <p><strong>Hi! I'm your AI coding assistant.</strong></p>
+                            <p>I can help you:</p>
+                            <ul>
+                                <li>Modify your code based on instructions</li>
+                                <li>Explain code and answer questions</li>
+                                <li>Debug and fix issues</li>
+                                <li>Add new features</li>
+                            </ul>
+                            <p>Upload a folder and select a file to get started!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <div class="project-files-indicator" id="projectFilesIndicator" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                            </path>
+                        </svg>
+                        <span id="fileCountText">0 files loaded</span>
+                    </div>
+                    <div class="chat-input-wrapper">
+                        <textarea id="chatInput" placeholder="Describe what you want to change (AI sees all files)..."
+                            rows="1"></textarea>
+                        <button class="btn btn-send" id="sendBtn" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <!-- Puter.js for AI (loaded after our page renders) -->
+    <script src="https://js.puter.com/v2/"></script>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+
+</html>
